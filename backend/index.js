@@ -6,13 +6,17 @@ import DBConnect from "./src/config/DBConnect.js";
 import authRoutes from "./src/routes/auth/index.js";
 import TopicRoutes from "./src/routes/admin/TopicRoutes.js";
 import PostRoutes from "./src/routes/admin/PostRoutes.js";
+import path from "path";
+import uploadFile from "./src/routes/uploadFile.js";
 
+// #region server
 dotenv.config();
-
+const __dirname = path.resolve();
 const port = parseInt(process.env.PORT);
 const app = express();
+// #endregion server
 
-// middlewares
+// #region middlewares
 app.use(
   cors({
     credentials: true,
@@ -22,7 +26,7 @@ app.use(
 );
 app.use(express.json());
 app.use(cookieParser());
-
+app.use("/uploads", express.static(path.join(__dirname, "src", "uploads")));
 app.use("", (req, res, next) => {
   console.log("\nRequest");
   console.log({
@@ -34,13 +38,17 @@ app.use("", (req, res, next) => {
   });
   next();
 });
+// #endregion routes
 
-// routes
+// #region routes
+// upload file
+app.use("/api/upload-file", uploadFile);
+// auth routes
 app.use("/api/auth", authRoutes);
-
-// admi routes
+// admin routes
 app.use("/api/admin/topics", TopicRoutes);
 app.use("/api/admin/posts", PostRoutes);
+// #endregion routes
 
 app.listen(port, async function () {
   await DBConnect();

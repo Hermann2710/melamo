@@ -6,7 +6,7 @@ import AdminHeaderRight from "./right";
 function AdminHeader() {
   const { toggleSidebar } = useSidebar();
   return (
-    <div className="w-full px-16 py-2">
+    <div className="w-full px-16 py-5">
       <div className="flex justify-between items-center">
         <Button variant="ghost" onClick={toggleSidebar}>
           <Menu />

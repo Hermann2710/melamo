@@ -3,6 +3,7 @@ import ProtectedRoute from "../common/ProtectedRoute";
 import { SidebarProvider } from "../ui/sidebar";
 import AdminSidebar from "../admin/Sidebar";
 import AdminHeader from "../admin/header";
+import DynamicBreadcrumbs from "../common/DynamicBreadcrumbs";
 
 function AdminLayout() {
   return (
@@ -11,7 +12,10 @@ function AdminLayout() {
         <AdminSidebar />
         <main className="w-full h-full">
           <AdminHeader />
-          <Outlet />
+          <div className="mx-8 lg:mx-12 xl:mx-18">
+            <DynamicBreadcrumbs />
+            <Outlet />
+          </div>
         </main>
       </SidebarProvider>
     </ProtectedRoute>

@@ -14,7 +14,8 @@ import DashboardLayout from "./components/layouts/DashboardLayout";
 import AdminLayout from "./components/layouts/AdminLayout";
 import AdminHome from "./pages/admin";
 import AdminTopics from "./pages/admin/topics";
-import { fetchTopics } from "./store/admin";
+import { fetchTopics } from "./store/topics";
+import AdminTopicsDetails from "./pages/admin/topics/details";
 
 function App() {
   const dispatch = useDispatch<AppDispatch>();
@@ -55,6 +56,7 @@ function App() {
       <Route path="/admin" element={<AdminLayout />}>
         <Route path="" element={<AdminHome />} />
         <Route path="topics" element={<AdminTopics />} />
+        <Route path="topics/:slug" element={<AdminTopicsDetails />} />
       </Route>
     </Routes>
   );

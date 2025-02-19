@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction } from "react";
+import { Dispatch, FormEvent, SetStateAction } from "react";
 import {
   Sheet,
   SheetContent,
@@ -25,7 +25,8 @@ interface FormLayoutProps {
   formControls: FormControl[];
   formData: any;
   setFormData: Dispatch<SetStateAction<any>>;
-  onSubmit: VoidFunction;
+  onSubmit: (e: FormEvent<HTMLFormElement>) => void;
+  onReset: () => void;
   open: boolean;
   setOpen: Dispatch<SetStateAction<boolean>>;
   isEditMode: boolean;
@@ -38,6 +39,7 @@ function FormLayout({
   formData,
   setFormData,
   onSubmit,
+  onReset,
   open,
   setOpen,
   isEditMode,
@@ -127,7 +129,7 @@ function FormLayout({
             ))}
           </div>
           <SheetFooter>
-            <Button type="reset">Reset</Button>
+            <Button type="reset" onClick={onReset}>Reset</Button>
             <Button type="submit">{isEditMode ? "Update" : "Add"}</Button>
           </SheetFooter>
         </form>
