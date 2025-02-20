@@ -42,37 +42,39 @@ export default class PostController {
           message: "The post cannot be empty.",
         });
       } else {
-        const t = Topic.findById(topic);
+        const t = await Topic.findById(topic);
         if (!t)
           return res.json({
             success: false,
             message: "Topic not found",
           });
-        const a = User.findById(author);
+        const a = await User.findById(author);
         if (!a)
           return res.json({
             success: false,
             message: "Author not found",
           });
-      }
-      const post = new Post({
-        title: title.trim(),
-        slug: slug.trim(),
-        description: description ? description.trim() : null,
-        postImage: postImage ? postImage.trim() : null,
-        author: author.trim(),
-        topic: topic.trim(),
-      });
-      await post.save();
-      // Update the topic total posts count
-      t.totalPosts += 1;
-      await t.save();
 
-      return res.json({
-        success: true,
-        message: "Post created successfully",
-        post: post,
-      });
+        const post = new Post({
+          title: title.trim(),
+          slug: slug.trim(),
+          description: description ? description.trim() : null,
+          postImage: postImage ? postImage.trim() : null,
+          author: author,
+          topic: topic,
+        });
+        await post.save().populate(["topic", "author"]);
+        // Update the topic total posts count
+        console.log(t);
+        t.totalPosts += 1;
+        await t.save();
+
+        return res.json({
+          success: true,
+          message: "Post created successfully",
+          post: post,
+        });
+      }
     } catch (error) {
       console.log("Error when creating post", error);
       if (error instanceof Error) {
@@ -124,7 +126,8 @@ export default class PostController {
               post.description = description.trim();
               post.postImage = postImage.trim();
               post.topic = topic.trim();
-              await topic.save();
+              await post.save();
+              post = await post.populate(["topic", "author"]);
 
               return res.json({
                 success: true,

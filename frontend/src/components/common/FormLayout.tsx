@@ -16,7 +16,9 @@ import { handleChangeInput, handleChangeTextarea } from "@/hooks/useFormInput";
 import {
   Select,
   SelectContent,
+  SelectGroup,
   SelectItem,
+  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
@@ -79,16 +81,28 @@ function FormLayout({
         break;
       case "select":
         element = (
-          <Select name={formControl.name} value={value}>
+          <Select
+            name={formControl.name}
+            value={value}
+            onValueChange={(value) =>
+              setFormData((prev: any) => ({
+                ...prev,
+                [formControl.name]: value,
+              }))
+            }
+          >
             <SelectTrigger>
-              <SelectValue placeholder={formControl.placeholder} />
+              <SelectValue placeholder={formControl.placeholder}></SelectValue>
             </SelectTrigger>
             <SelectContent>
-              {formControl.options?.map((item) => (
-                <SelectItem value={item.value} key={item.label}>
-                  <SelectValue placeholder={item.label} />
-                </SelectItem>
-              ))}
+              <SelectGroup>
+                <SelectLabel>{formControl.placeholder}</SelectLabel>
+                {formControl.options?.map((item) => (
+                  <SelectItem value={item.value} key={item.label}>
+                    {item.label}
+                  </SelectItem>
+                ))}
+              </SelectGroup>
             </SelectContent>
           </Select>
         );
@@ -128,8 +142,10 @@ function FormLayout({
               </div>
             ))}
           </div>
-          <SheetFooter>
-            <Button type="reset" onClick={onReset}>Reset</Button>
+          <SheetFooter className="gap-2">
+            <Button type="reset" onClick={onReset}>
+              Reset
+            </Button>
             <Button type="submit">{isEditMode ? "Update" : "Add"}</Button>
           </SheetFooter>
         </form>

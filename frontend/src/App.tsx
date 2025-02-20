@@ -16,6 +16,8 @@ import AdminHome from "./pages/admin";
 import AdminTopics from "./pages/admin/topics";
 import { fetchTopics } from "./store/topics";
 import AdminTopicsDetails from "./pages/admin/topics/details";
+import AdminPosts from "./pages/admin/posts";
+import { fetchPosts } from "./store/posts";
 
 function App() {
   const dispatch = useDispatch<AppDispatch>();
@@ -24,7 +26,8 @@ function App() {
   useEffect(() => {
     dispatch(checkAuthUser());
     dispatch(fetchTopics());
-  }, []);
+    dispatch(fetchPosts({}));
+  }, [dispatch]);
 
   if (isLoading) {
     return (
@@ -57,6 +60,7 @@ function App() {
         <Route path="" element={<AdminHome />} />
         <Route path="topics" element={<AdminTopics />} />
         <Route path="topics/:slug" element={<AdminTopicsDetails />} />
+        <Route path="posts" element={<AdminPosts />} />
       </Route>
     </Routes>
   );

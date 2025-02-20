@@ -38,3 +38,29 @@ export const TopicsFormControl: FormControl[] = [
     componentType: "textarea",
   },
 ];
+
+export const PostsFormControls: FormControl[] = [
+  {
+    name: "title",
+    label: "Post's Title",
+    type: "text",
+    placeholder: "Post's Title",
+    required: true,
+    componentType: "input",
+  },
+  {
+    name: "slug",
+    label: "Post's Slug",
+    type: "text",
+    placeholder: "Post's slug",
+    required: true,
+    componentType: "input",
+  },
+  {
+    name: "description",
+    label: "Post's Description",
+    placeholder: "Post's description",
+    required: true,
+    componentType: "textarea",
+  },
+];

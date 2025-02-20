@@ -50,7 +50,7 @@ export const deleteTopic = createAsyncThunk<any, string>(
 );
 
 const adminSlice = createSlice({
-  name: "adminSlice",
+  name: "topicsSlice",
   initialState: initialState,
   reducers: {},
   extraReducers: (builder) => {
@@ -90,11 +90,12 @@ const adminSlice = createSlice({
       .addCase(editTopic.fulfilled, (state, action) => {
         state.isLoading = false;
         if (action.payload.success) {
-          state.topics.map((topic) => {
-            if (topic._id === action.payload.topic._id) {
-              topic = action.payload.topic;
-            }
-          });
+          const topicIndex = state.topics.findIndex(
+            (topic) => topic._id === action.payload.topic._id
+          );
+          if (topicIndex !== -1) {
+            state.topics[topicIndex] = action.payload.topic;
+          }
         }
       })
       .addCase(editTopic.rejected, (state) => {

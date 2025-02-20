@@ -4,7 +4,7 @@ import { TopicsFormControl } from "@/config/forms";
 import Topic, { initialTopicState } from "@/types/Topic";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "@/store";
-import { addTopic, editTopic, fetchTopics } from "@/store/topics";
+import { addTopic, editTopic } from "@/store/topics";
 import { useToast } from "@/hooks/use-toast";
 
 type TopicFormProps = {
@@ -31,7 +31,6 @@ function TopicForm({
     if (selectedId) {
       dispatch(editTopic({ id: selectedId, data: data })).then((action) => {
         if (action.payload.success) {
-          dispatch(fetchTopics());
           setData(initialTopicState);
           setOpen(!open);
           setSelectedId("");

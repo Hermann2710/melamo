@@ -1,11 +1,13 @@
 import { configureStore } from "@reduxjs/toolkit";
 import authReducer from "./auth";
-import adminReducer from "./topics";
+import topicsReducer from "./topics";
+import postsReducer from "./posts";
 
 const AppStore = configureStore({
   reducer: {
     auth: authReducer,
-    topics: adminReducer,
+    topics: topicsReducer,
+    posts: postsReducer,
   },
 });
 
