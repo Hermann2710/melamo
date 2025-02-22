@@ -8,6 +8,29 @@ import verifyToken from "../../utils/verifyToken.js";
 dotenv.config();
 const salt = await bcrypt.genSalt(parseInt(process.env.SALT));
 
+export async function fetchUsers(req, res) {
+  try {
+    const users = await User.find({});
+    return res.json({
+      success: true,
+      users: users,
+    });
+  } catch (error) {
+    console.log(`Error fetching users ${error}`);
+    if (error instanceof Error) {
+      res.json({
+        success: false,
+        message: error.message,
+      });
+    } else {
+      res.json({
+        success: false,
+        message: error,
+      });
+    }
+  }
+}
+
 export async function registerUser(req, res) {
   try {
     const { username, email, password } = req.body;
@@ -107,7 +130,64 @@ export async function loginUser(req, res) {
   }
 }
 
-export async function deleteUser(req, res) {
+export async function updateUser(req, res) {
+  try {
+    const { id } = req.params;
+    if (!id) {
+      return res.json({
+        success: false,
+        message: "User's identifier required",
+      });
+    } else {
+      const { username, firstname, lastname, email, role, avatar } = req.body;
+      const user = await User.findById(id).populate([
+        "followers",
+        "followings",
+      ]);
+      if (!user) {
+        return res.json({
+          success: false,
+          message: "User not found",
+        });
+      } else {
+        if (email && !validator.isEmail(email)) {
+          return res.json({
+            success: false,
+            message: "Email is not valid",
+          });
+        }
+        user.username = username || user.username;
+        user.firstname = firstname || user.firstname;
+        user.lastname = lastname || user.firstname;
+        user.email = email || user.firstname;
+        user.role = role || user.firstname;
+        user.avatar = avatar || user.firstname;
+        await user.save();
+
+        return res.json({
+          success: true,
+          message: "User updated successfully",
+          user: user,
+        });
+      }
+    }
+  } catch (error) {
+    console.log(`Error updating user ${error}`);
+    if (error instanceof Error) {
+      return res.json({
+        success: false,
+        message: error.message,
+      });
+    } else {
+      return res.json({
+        success: false,
+        message: error,
+      });
+    }
+  }
+}
+
+export async function deleteProfile(req, res) {
   try {
     const { id } = req.params;
     if (!id) {
@@ -127,6 +207,39 @@ export async function deleteUser(req, res) {
         return res.json({
           success: true,
           message: "User deleted successfully",
+          user: user,
+        });
+      }
+    }
+  } catch (error) {
+    console.log("Error while deleting user", error);
+    return res.json({
+      success: false,
+      message: error.message,
+    });
+  }
+}
+
+export async function deleteUser(req, res) {
+  try {
+    const { id } = req.params;
+    if (!id) {
+      return res.json({
+        success: false,
+        message: "User ID is required",
+      });
+    } else {
+      const user = await User.findByIdAndDelete(id);
+      if (!user) {
+        return res.json({
+          success: false,
+          message: "User does not exist",
+        });
+      } else {
+        return res.json({
+          success: true,
+          message: "User deleted successfully",
+          user: user,
         });
       }
     }
@@ -185,5 +298,172 @@ export async function checkAuth(req, res) {
       success: false,
       message: error.message,
     });
+  }
+}
+
+export async function updateProfileDetails(req, res) {
+  try {
+    const { id } = req.params;
+    if (!id) {
+      return res.json({
+        success: false,
+        message: "A user ID is required",
+      });
+    } else {
+      const user = await User.findById(id).populate([
+        "followers",
+        "followings",
+      ]);
+
+      if (!user) {
+        return res.json({
+          success: false,
+          message: "User not found",
+        });
+      } else {
+        const { username, firstname, lastname, email } = req.body;
+        if (email && !validator.isEmail(email)) {
+          return res.json({
+            success: false,
+            message: "The email must be valid",
+          });
+        } else {
+          user.username = username || user.username;
+          user.firstname = firstname || user.firstname;
+          user.lastname = lastname || user.lastname;
+          user.email = email || user.email;
+          await user.save();
+
+          return res.json({
+            success: true,
+            message: "Profile updated successfully",
+            user: user,
+          });
+        }
+      }
+    }
+  } catch (error) {
+    console.log(`Error updating profile ${error}`);
+    if (error instanceof Error) {
+      return res.json({
+        success: false,
+        message: error.message,
+      });
+    } else {
+      return res.json({
+        success: false,
+        message: error,
+      });
+    }
+  }
+}
+
+export async function updateProfilePassword(req, res) {
+  try {
+    const { id } = req.params;
+    if (!id) {
+      return res.json({
+        success: false,
+        message: "A user ID is required",
+      });
+    } else {
+      const user = await User.findById(id).populate([
+        "followers",
+        "followings",
+      ]);
+      if (!user) {
+        return res.json({
+          success: false,
+          message: "User not found",
+        });
+      } else {
+        const { currentPassword, newPassword } = req.body;
+        if (
+          !validator.isStrongPassword(currentPassword) ||
+          !validator.isStrongPassword(newPassword)
+        ) {
+          return res.json({
+            success: false,
+            message: "All password must be valid",
+          });
+        } else {
+          const valid = await bcrypt.compare(currentPassword, user.password);
+          if (!valid) {
+            return res.json({
+              success: false,
+              message: "The current password don't match",
+            });
+          } else {
+            user.password = await bcrypt.hash(newPassword, salt);
+            await user.save();
+
+            return res.json({
+              success: true,
+              message: "Password changed successfully",
+              user: user,
+            });
+          }
+        }
+      }
+    }
+  } catch (error) {
+    console.log(`Error while updating profile password ${error}`);
+    if (error instanceof Error) {
+      return res.json({
+        success: false,
+        message: error.message,
+      });
+    } else {
+      return res.json({
+        success: false,
+        message: error,
+      });
+    }
+  }
+}
+
+export async function updateProfileAvatar(req, res) {
+  try {
+    const { id } = req.params;
+    if (!id) {
+      return res.json({
+        success: false,
+        message: "A user ID is required",
+      });
+    } else {
+      const user = await User.findById(id).populate([
+        "followers",
+        "followings",
+      ]);
+      if (!user) {
+        return res.json({
+          success: false,
+          message: "User not found",
+        });
+      } else {
+        const { avatar } = req.body;
+        user.avatar = avatar || user.avatar;
+        await user.save();
+
+        return res.json({
+          success: true,
+          message: "Profile image updated successfully",
+          user: user,
+        });
+      }
+    }
+  } catch (error) {
+    console.log(`Error while updating profile image ${error}`);
+    if (error instanceof Error) {
+      return res.json({
+        success: false,
+        message: error.message,
+      });
+    } else {
+      return res.json({
+        success: false,
+        message: error,
+      });
+    }
   }
 }
