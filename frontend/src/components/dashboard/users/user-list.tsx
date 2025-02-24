@@ -14,6 +14,7 @@ import { useSelector } from "react-redux";
 import { Dispatch, SetStateAction, useState } from "react";
 import DeleteUser from "./delete-user";
 import User from "@/types/User";
+import { Link } from "react-router-dom";
 
 function DashboardUsersList({
   setSelectedId,
@@ -62,7 +63,9 @@ function DashboardUsersList({
             users.map((user) => (
               <TableRow key={user._id}>
                 <TableCell>{user._id.substring(0, 6)}...</TableCell>
-                <TableCell className="font-medium">{user.username}</TableCell>
+                <TableCell className="font-medium">
+                  <Link to={`${user.username}`}>{user.username}</Link>
+                </TableCell>
                 <TableCell>{user.email}</TableCell>
                 <TableCell
                   className={`${user.role === "admin" && "font-semibold"}`}
@@ -83,7 +86,9 @@ function DashboardUsersList({
                         onClick={() => handleDelete(user)}
                       />
                     </>
-                  ): <Lock className="w-4" color="gray" />}
+                  ) : (
+                    <Lock className="w-4" color="gray" />
+                  )}
                 </TableCell>
               </TableRow>
             ))

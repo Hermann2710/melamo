@@ -442,7 +442,7 @@ export async function updateProfileAvatar(req, res) {
         });
       } else {
         const { avatar } = req.body;
-        user.avatar = avatar || user.avatar;
+        user.avatar = avatar ? avatar : "";
         await user.save();
 
         return res.json({

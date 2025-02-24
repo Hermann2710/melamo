@@ -49,6 +49,40 @@ export const deleteProfile = createAsyncThunk<any, User>(
   }
 );
 
+export const updateProfileDetails = createAsyncThunk<
+  any,
+  { id: string; data: any }
+>("auth/profile/details", async ({ id, data }) => {
+  const response = await axios.put(`${API}/auth/profile/details/${id}`, data, {
+    withCredentials: true,
+  });
+  return response.data;
+});
+
+export const updateProfilePassword = createAsyncThunk<
+  any,
+  { id: string; data: any }
+>("auth/profile/password", async ({ id, data }) => {
+  const response = await axios.patch(`${API}/auth/profile/password/${id}`, data, {
+    withCredentials: true,
+  });
+  return response.data;
+});
+
+export const updateProfileAvatar = createAsyncThunk<
+  any,
+  { id: string; avatar: string }
+>("auth/profile/avatar", async ({ id, avatar }) => {
+  const response = await axios.patch(
+    `${API}/auth/profile/avatar/${id}`,
+    { avatar: avatar },
+    {
+      withCredentials: true,
+    }
+  );
+  return response.data;
+});
+
 const authSlice = createSlice({
   name: "authSlice",
   initialState: initialAuthState,
@@ -110,17 +144,57 @@ const authSlice = createSlice({
       .addCase(logoutUser.rejected, (state) => {
         state.isLoading = false;
       })
-      // Handle update
+      // Handle delete
       .addCase(deleteProfile.pending, (state) => {
         state.isLoading = true;
       })
       .addCase(deleteProfile.fulfilled, (state, action) => {
         state.isLoading = false;
+        state.isAuthenticated = action.payload.success ? false : true;
         state.user = action.payload.success
           ? (action.payload.user as User)
           : state.user;
       })
       .addCase(deleteProfile.rejected, (state) => {
+        state.isLoading = false;
+      })
+      // Handle update profile details
+      .addCase(updateProfileDetails.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(updateProfileDetails.fulfilled, (state, action) => {
+        state.isLoading = false;
+        if (action.payload.success) {
+          state.user = action.payload.user;
+        }
+      })
+      .addCase(updateProfileDetails.rejected, (state) => {
+        state.isLoading = false;
+      })
+      // Handle update profile password
+      .addCase(updateProfilePassword.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(updateProfilePassword.fulfilled, (state, action) => {
+        state.isLoading = false;
+        if (action.payload.success) {
+          state.user = action.payload.user;
+        }
+      })
+      .addCase(updateProfilePassword.rejected, (state) => {
+        state.isLoading = false;
+      })
+      // Handle update profile avatar
+      .addCase(updateProfileAvatar.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(updateProfileAvatar.fulfilled, (state, action) => {
+        state.isLoading = false;
+        if (action.payload.success) {
+          state.user = action.payload.user;
+        }
+      })
+      .addCase(updateProfileAvatar.rejected, (state) => {
         state.isLoading = false;
       });
   },

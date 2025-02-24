@@ -1,16 +1,23 @@
 import DashboardUserForm from "@/components/dashboard/users/user-form";
 import DashboardUsersList from "@/components/dashboard/users/user-list";
-import { useState } from "react";
+import { AppDispatch } from "@/store";
+import { fetchUsers } from "@/store/users";
+import { useEffect, useState } from "react";
+import { useDispatch } from "react-redux";
 
 function DashboardUsers() {
   const [open, setOpen] = useState<boolean>(false);
   const [selectedId, setSelectedId] = useState<string>("");
+  const dispatch = useDispatch<AppDispatch>();
+
+  useEffect(() => {
+    dispatch(fetchUsers());
+  }, []);
+
   return (
     <div>
-      <div>
-        <h1 className="text-xl font-bold mb-3">Dashboard users list</h1>
-        <DashboardUsersList setOpen={setOpen} setSelectedId={setSelectedId} />
-      </div>
+      <h1 className="text-xl font-bold mb-3">Dashboard users list</h1>
+      <DashboardUsersList setOpen={setOpen} setSelectedId={setSelectedId} />
       <DashboardUserForm
         open={open}
         setOpen={setOpen}

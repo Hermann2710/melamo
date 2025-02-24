@@ -7,6 +7,7 @@ import DBConnect from "./src/config/DBConnect.js";
 import authRoutes from "./src/routes/auth/index.js";
 import postRoutes from "./src/routes/posts/index.js";
 import usersRoutes from "./src/routes/users/index.js";
+import uploadFile from "./src/routes/uploadFile.js";
 
 // ENV VARS
 dotenv.config();
@@ -21,6 +22,13 @@ app.use(
     credentials: true,
     origin: ["http://localhost:3000"],
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
+    allowedHeaders: [
+      "Content-Type",
+      "Authorization",
+      "Cache-Control",
+      "Expires",
+      "Pragma",
+    ],
   })
 );
 app.use(express.json());
@@ -28,12 +36,13 @@ app.use(cookieParser());
 app.use("/uploads", express.static(path.join(__dirname, "src", "uploads")));
 
 // Routes
+app.use("/api/upload-image", uploadFile);
 app.use("/api/auth", authRoutes);
 app.use("/api/users", usersRoutes);
 app.use("/api/posts", postRoutes);
 
 // Listening on server
-app.listen(port, async function() {
+app.listen(port, async function () {
   await DBConnect();
-  console.log("Listening on port "+ port);
+  console.log("Listening on port " + port);
 });

@@ -15,6 +15,9 @@ import ForgotPassword from "./screens/auth/forgot-password";
 import DashboardPosts from "./screens/dashboard/posts";
 import DashboardUsers from "./screens/dashboard/users";
 import { fetchUsers } from "./store/users";
+import DashboardSettings from "./screens/dashboard/settings";
+import DashboardProfile from "./screens/dashboard/settings/profile";
+import DashboardUsersDetails from "./screens/dashboard/users/details";
 
 function App() {
   const dispatch = useDispatch<AppDispatch>();
@@ -40,9 +43,14 @@ function App() {
       </Route>
       {/* Dashboard routes */}
       <Route path="/dashboard" Component={DashboardLayout}>
+        {/* Dashboard General */}
         <Route path="" Component={Dashboard} />
         <Route path="posts" Component={DashboardPosts} />
         <Route path="users" Component={DashboardUsers} />
+        <Route path="users/:username" Component={DashboardUsersDetails} />
+        {/* Dashboard Settings */}
+        <Route path="settings" Component={DashboardSettings} />
+        <Route path="profile" Component={DashboardProfile} />
       </Route>
 
       {/* Not found page */}

@@ -39,3 +39,65 @@ export const AdminUpdateUserFormData: FormControl[] = [
     ],
   },
 ];
+
+export const DashboardProfileDetailsFormControls: FormControl[] = [
+  {
+    label: "Username",
+    name: "username",
+    placeholder: "Username",
+    componentType: "input",
+    type: "text",
+    required: false,
+  },
+  {
+    label: "Firstname",
+    name: "firstname",
+    placeholder: "Firstname",
+    componentType: "input",
+    type: "text",
+    required: false,
+  },
+  {
+    label: "Lastname",
+    name: "lastname",
+    placeholder: "Lastname",
+    componentType: "input",
+    type: "text",
+    required: false,
+  },
+  {
+    label: "Email",
+    name: "email",
+    placeholder: "Email",
+    componentType: "input",
+    type: "email",
+    required: false,
+  },
+];
+
+export const DashboardProfilePasswordFormControls: FormControl[] = [
+  {
+    label: "Current Password",
+    name: "currentPassword",
+    placeholder: "********",
+    componentType: "input",
+    type: "password",
+    required: false,
+  },
+  {
+    label: "New Password",
+    name: "newPassword",
+    placeholder: "********",
+    componentType: "input",
+    type: "password",
+    required: false,
+  },
+  {
+    label: "Confirm Password",
+    name: "confirmPassword",
+    placeholder: "********",
+    componentType: "input",
+    type: "password",
+    required: false,
+  },
+];
