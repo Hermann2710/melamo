@@ -1,6 +1,6 @@
-import MessageForm from "@/components/home/conversations/form";
-import ConversationMessages from "@/components/home/conversations/messages";
-import ConversationsList from "@/components/home/conversations/users";
+import MessageForm from "@/components/home/conversations/MessageForm";
+import ConversationMessages from "@/components/home/conversations/ConversationMessages";
+import ConversationsList from "@/components/home/conversations/ConversationsList";
 import { AppDispatch, RootState } from "@/store";
 import {
   editMessage,
@@ -21,25 +21,18 @@ function HomeMessages() {
   const dispatch = useDispatch<AppDispatch>();
   const [text, setText] = useState<string>("");
   const [message, setMessage] = useState<Message | null>(null);
-
   const [receiverId, setReceiverId] = useState<string>("");
 
   useEffect(() => {
-    if (user) {
-      if (username) {
-        if (username !== user.username) {
-          users.map((u) => {
-            if (u.username === username) {
-              setReceiverId(u._id);
-              return;
-            }
-          });
-        }
-      } else {
-        setReceiverId("");
+    if (user && username && username !== user.username) {
+      const selectedUser = users.find((u) => u.username === username);
+      if (selectedUser) {
+        setReceiverId(selectedUser._id);
       }
+    } else {
+      setReceiverId("");
     }
-  }, [username]);
+  }, [username, user, users]);
 
   useEffect(() => {
     if (receiverId && user) {
@@ -47,7 +40,7 @@ function HomeMessages() {
     } else {
       dispatch(resetConversation());
     }
-  }, [receiverId]);
+  }, [receiverId, user, dispatch]);
 
   useEffect(() => {
     if (message) {
@@ -59,79 +52,62 @@ function HomeMessages() {
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (user) {
-      if (receiverId) {
-        if (message) {
-          dispatch(
-            editMessage({
-              messageId: message._id,
-              text: text,
-            })
-          ).then((action) => {
-            if (action.payload.success) {
-              setText("");
-              setMessage(null);
-              toast.success(action.payload.message, { closeButton: true });
-            } else {
-              toast.error(action.payload.message, { closeButton: true });
-            }
-          });
+    if (user && receiverId) {
+      const action = message
+        ? editMessage({ messageId: message._id, text, receiverId })
+        : sendMessage({ receiverId, senderId: user._id, text });
+
+      dispatch(action).unwrap().then((payload) => {
+        if (payload.success) {
+          setText("");
+          setMessage(null);
+          toast.success(payload.message, { closeButton: true });
         } else {
-          dispatch(
-            sendMessage({
-              receiverId: receiverId,
-              senderId: user._id,
-              text: text,
-            })
-          ).then((action) => {
-            if (action.payload.success) {
-              setText("");
-              toast.success(action.payload.message, { closeButton: true });
-            } else {
-              toast.error(action.payload.message, { closeButton: true });
-            }
-          });
+          toast.error(payload.message, { closeButton: true });
         }
-      } else {
-        toast.error("Please select a conversation", { closeButton: true });
-      }
+      }).catch((error) => {
+        toast.error(error.message || "An error occurred", { closeButton: true });
+      });
     } else {
-      toast.error("You must be authenticated", { closeButton: true });
+      toast.error("Please select a conversation", { closeButton: true });
     }
   };
 
+  const toggleEdit = () => !!message?._id;
+
   if (!user) {
-    return (
-      <h1 className="text-2xl font-bold text-center mb-4">
-        You are not allowed
-      </h1>
-    );
-  } else {
-    if (user.username === username) {
-      return (
-        <h1 className="text-2xl font-bold text-center mb-4">
-          You cannot be the receiver
-        </h1>
-      );
-    } else {
-      return (
-        <div className="mb-4">
-          <h1 className="font-semibold text-3xl my-4">Conversations</h1>
-          <div className="flex flex-col sm:flex-row gap-3">
-            <ConversationsList />
-            <div className="flex flex-col flex-1">
-              <ConversationMessages setMessage={setMessage} />
+    return <h1 className="text-2xl font-bold text-center mb-4">You are not allowed</h1>;
+  }
+
+  if (user.username === username) {
+    return <h1 className="text-2xl font-bold text-center mb-4">You cannot be the receiver</h1>;
+  }
+
+  return (
+    <div className="my-4">
+      <div className="flex flex-col sm:flex-row gap-5">
+        <ConversationsList />
+        <div className="w-full sm:w-9/12 bg-white shadow-md rounded-lg p-4 h-[580px] flex flex-col">
+          <div className="flex-1 overflow-y-auto">
+            <h2 className="text-xl font-bold">
+              {users.find((u) => u._id === receiverId)?.username}
+            </h2>
+            <ConversationMessages setMessage={setMessage} receiverId={receiverId} />
+          </div>
+          {receiverId && (
+            <div className="mt-4">
               <MessageForm
-                handleSubmit={handleSubmit}
-                setMessage={setText}
                 message={text}
+                setMessage={setText}
+                isEditMode={toggleEdit()}
+                handleSubmit={handleSubmit}
               />
             </div>
-          </div>
+          )}
         </div>
-      );
-    }
-  }
+      </div>
+    </div>
+  );
 }
 
 export default HomeMessages;

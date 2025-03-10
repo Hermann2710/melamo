@@ -19,9 +19,11 @@ import { toast } from "sonner";
 type Props = {
   message: Message;
   setMessage: Dispatch<SetStateAction<Message | null>>;
+  receiverId: string;
+  isSender: boolean;
 };
 
-function MessageCard({ message, setMessage }: Props) {
+function MessageCard({ message, setMessage, receiverId, isSender }: Props) {
   const { user } = useSelector((state: RootState) => state.authReducer);
   const { users } = useSelector((state: RootState) => state.usersReducer);
   const dispatch = useDispatch<AppDispatch>();
@@ -37,11 +39,13 @@ function MessageCard({ message, setMessage }: Props) {
   };
 
   const handleDelete = () => {
-    dispatch(deleteMessage({ messageId: message._id })).then((action) => {
+    dispatch(
+      deleteMessage({ messageId: message._id, receiverId: receiverId })
+    ).then((action) => {
       if (action.payload.success) {
         return toast.success(action.payload.message, { closeButton: true });
       } else {
-        return toast.success(action.payload.message, { closeButton: true });
+        return toast.error(action.payload.message, { closeButton: true });
       }
     });
   };
@@ -55,8 +59,8 @@ function MessageCard({ message, setMessage }: Props) {
   } else {
     return (
       <div
-        className={`w-fit p-2 my-1 border rounded-lg ${
-          user._id === message.sender ? "self-end" : "self-start bg-muted"
+        className={`w-fit p-4 my-2 border rounded-lg shadow-md ${
+          isSender ? "self-end bg-blue-100" : "self-start bg-gray-100"
         }`}
       >
         <ContextMenu>
@@ -67,7 +71,7 @@ function MessageCard({ message, setMessage }: Props) {
                 avatar={findUser().avatar}
               />
               <div>
-                <p className="text-[8px] flex justify-between gap-2">
+                <p className="text-xs flex justify-between gap-2 text-gray-500">
                   <span>
                     {new Date(message.createdAt).toLocaleTimeString()}
                   </span>
@@ -75,9 +79,9 @@ function MessageCard({ message, setMessage }: Props) {
                     {message.createdAt !== message.updatedAt && "Edited"}
                   </span>
                 </p>
-                <p className="flex items-center">
+                <p className="flex items-center text-gray-700">
                   {message.text}&nbsp;
-                  <CheckCheck size={12} />
+                  <CheckCheck size={12} className="text-green-500" />
                 </p>
               </div>
             </div>

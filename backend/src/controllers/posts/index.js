@@ -1,5 +1,6 @@
 import Post from "../../models/Post.js";
 import User from "../../models/User.js";
+import Comment from "../../models/Comment.js";
 
 export default class PostController {
   static async fetchPosts(req, res) {
@@ -34,7 +35,7 @@ export default class PostController {
 
   static async createPost(req, res) {
     try {
-      const { message, author } = req.body;
+      const { title, subtitle, slug, message, author } = req.body;
       const user = await User.findById(author);
       if (!user) {
         return res.json({
@@ -43,6 +44,9 @@ export default class PostController {
         });
       }
       const post = await Post.create({
+        title: title,
+        subtitle: subtitle,
+        slug: slug,
         message: message,
         author: user._id,
       });
@@ -70,7 +74,7 @@ export default class PostController {
   static async updatePost(req, res) {
     try {
       const { id } = req.params;
-      const { message, author } = req.body;
+      const { title, slug, subtitle, message, author } = req.body;
       let post = await Post.findById(id);
       if (!post) {
         return res.json({
@@ -85,7 +89,10 @@ export default class PostController {
             message: "Author doesn't exist",
           });
         } else {
-          post.message = message;
+          post.title = title || post.title;
+          post.slug = slug || post.slug;
+          post.subtitle = subtitle || post.subtitle;
+          post.message = message || post.message;
           post.author = user._id;
           await post.save();
 
@@ -122,6 +129,10 @@ export default class PostController {
           message: "Post doesn't exist",
         });
       } else {
+        const comments = await Comment.find({ post: post._id });
+        comments.forEach(async (comment) => {
+            await comment.deleteOne();
+        });
         return res.json({
           success: true,
           message: "Post deleted successfully",

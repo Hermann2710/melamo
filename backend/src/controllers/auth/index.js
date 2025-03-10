@@ -4,6 +4,8 @@ import dotenv from "dotenv";
 import bcrypt from "bcryptjs";
 import generateToken from "../../utils/generateToken.js";
 import verifyToken from "../../utils/verifyToken.js";
+import Post from "../../models/Post.js";
+import Comment from "../../models/Comment.js";
 
 dotenv.config();
 const salt = await bcrypt.genSalt(parseInt(process.env.SALT));
@@ -203,6 +205,14 @@ export async function deleteProfile(req, res) {
           message: "User does not exist",
         });
       } else {
+        const posts = await Post.find({ author: user._id });
+        const comments = await Comment.find({ author: user._id });
+        posts.forEach(async (post) => {
+          await post.deleteOne();
+        });
+        comments.forEach(async (comment) => {
+          await comment.deleteOne();
+        });
         res.clearCookie("token");
         return res.json({
           success: true,
@@ -236,6 +246,14 @@ export async function deleteUser(req, res) {
           message: "User does not exist",
         });
       } else {
+        const posts = await Post.find({ author: user._id });
+        const comments = await Comment.find({ author: user._id });
+        posts.forEach(async (post) => {
+          await post.deleteOne();
+        });
+        comments.forEach(async (comment) => {
+          await comment.deleteOne();
+        });
         return res.json({
           success: true,
           message: "User deleted successfully",
@@ -465,5 +483,114 @@ export async function updateProfileAvatar(req, res) {
         message: error,
       });
     }
+  }
+}
+
+export async function followUser(req, res) {
+  try {
+    const { user_1, user_2 } = req.body;
+    if (!user_1) {
+      return res.json({
+        success: false,
+        message: "You must select a valid user",
+      });
+    } else {
+      if (!user_2) {
+        return res.json({
+          success: false,
+          message: "You must be authenticated",
+        });
+      } else {
+        const user1 = await User.findById(user_1);
+        const user2 = await User.findById(user_2);
+        if (!user1) {
+          return res.json({
+            success: false,
+            message: "The user that you want to follow doesn't exist",
+          });
+        } else {
+          if (!user2) {
+            return res.json({
+              success: false,
+              message: "You must be authenticated",
+            });
+          } else {
+            user1.followers.push(user2._id);
+            user2.followings.push(user1._id);
+            await user1.save();
+            await user2.save();
+
+            return res.json({
+              success: true,
+              message: `You follow now ${user1.username}`,
+              user: user1,
+            });
+          }
+        }
+      }
+    }
+  } catch (error) {
+    console.log(`Error in auth controller ${error.message}`);
+    res.json({
+      success: false,
+      message: error.message,
+    });
+  }
+}
+
+export async function unFollowUser(req, res) {
+  try {
+    const { user_1, user_2 } = req.body;
+    if (!user_1) {
+      return res.json({
+        success: false,
+        message: "You must select a valid user",
+      });
+    } else {
+      if (!user_2) {
+        return res.json({
+          success: false,
+          message: "You must be authenticated",
+        });
+      } else {
+        const user1 = await User.findById(user_1);
+        const user2 = await User.findById(user_2);
+        if (!user1) {
+          return res.json({
+            success: false,
+            message: "The user that you want to follow doesn't exist",
+          });
+        } else {
+          if (!user2) {
+            return res.json({
+              success: false,
+              message: "You must be authenticated",
+            });
+          } else {
+            const followers = user1.followers.filter(
+              (val) => val.toString() !== user2._id.toString()
+            );
+            user1.followers = followers;
+            await user1.save();
+
+            const followings = user2.followings.filter((val) => val.toString() !== user1._id.toString());
+            user2.followings = followings;
+            await user2.save();
+
+            return res.json({
+              success: true,
+              message: `You have unfollow ${user1.username}`,
+              user: user1,
+            });
+          }
+        }
+      }
+    }
+  } catch (error) {
+    console.log(`Error in auth controller ${error.message}`);
+    res.json({
+      success: false,
+      message: error.message,
+    });
   }
 }

@@ -1,5 +1,6 @@
-import AvatarLink from "@/components/common/avatarLink";
-import { Button } from "@/components/ui/button";
+import AvatarLink from "@/components/common/AvatarLink";
+import { Button } from "@/components/ui/Button";
+import useSocketContext from "@/contexts/SocketContext";
 import { AppDispatch, RootState } from "@/store";
 import { fetchMessages } from "@/store/conversations";
 import User from "@/types/User";
@@ -14,6 +15,11 @@ function ConversationsList() {
   const [receiverId, setReceiverId] = useState<string>("");
   const navigate = useNavigate();
   const { username } = useParams();
+  const { onlineUsers } = useSocketContext();
+
+  const checkOnline = (user: User) => {
+    return onlineUsers.includes(user._id);
+  };
 
   useEffect(() => {
     if (user) {
@@ -36,7 +42,7 @@ function ConversationsList() {
     );
   } else {
     return (
-      <div className="w-full sm:w-6/12 md:w-5/12 lg:w-4/12 xl:w-3/12">
+      <div className="flex flex-col flex-1 p-4 bg-gray-50 rounded-lg shadow-md">
         <h1 className="text-2xl font-black mb-3">Discussions</h1>
         <div className="w-full flex flex-col gap-3">
           {users.map((u) => {
@@ -47,11 +53,18 @@ function ConversationsList() {
                 <Button
                   onClick={() => handleSelectConversation(u)}
                   variant={u.username === username ? "secondary" : "ghost"}
-                  className="w-full flex gap-2 py-6"
+                  className="w-full flex gap-2 py-4 px-3 rounded-lg hover:bg-gray-100 transition"
                   key={u._id}
                 >
                   <AvatarLink username={u.username} avatar={u.avatar} />
-                  <div className="flex-1 text-start">{u.username}</div>
+                  <div className="flex-1 text-start flex justify-between items-center">
+                    <span className="font-medium">{u.username}</span>
+                    <span className="text-[8px]">
+                      {checkOnline(u) && (
+                        <div className="w-2 h-2 rounded-full bg-green-500" />
+                      )}
+                    </span>
+                  </div>
                 </Button>
               );
             }

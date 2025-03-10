@@ -8,13 +8,14 @@ import authRoutes from "./src/routes/auth/index.js";
 import postRoutes from "./src/routes/posts/index.js";
 import usersRoutes from "./src/routes/users/index.js";
 import uploadFile from "./src/routes/uploadFile.js";
+import commentRoutes from "./src/routes/comments/index.js";
+import messagesRoutes from "./src/routes/messages/index.js";
+import { app, server } from "./src/socket/index.js";
 
 // ENV VARS
 dotenv.config();
 const port = process.env.PORT;
 const __dirname = path.resolve();
-
-const app = express();
 
 // Middlewares
 app.use(
@@ -40,9 +41,11 @@ app.use("/api/upload-image", uploadFile);
 app.use("/api/auth", authRoutes);
 app.use("/api/users", usersRoutes);
 app.use("/api/posts", postRoutes);
+app.use("/api/comments", commentRoutes);
+app.use("/api/messages", messagesRoutes);
 
 // Listening on server
-app.listen(port, async function () {
+server.listen(port, async function () {
   await DBConnect();
   console.log("Listening on port " + port);
 });

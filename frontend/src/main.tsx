@@ -6,13 +6,16 @@ import { Provider } from "react-redux";
 import AppStore from "./store/index.ts";
 import { Toaster } from "sonner";
 import { BrowserRouter } from "react-router-dom";
+import { SocketContextProvider } from "./contexts/SocketContext.tsx";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <BrowserRouter>
       <Provider store={AppStore}>
-        <App />
-        <Toaster />
+        <SocketContextProvider>
+          <App />
+          <Toaster />
+        </SocketContextProvider>
       </Provider>
     </BrowserRouter>
   </StrictMode>
