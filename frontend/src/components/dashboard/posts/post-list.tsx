@@ -14,6 +14,7 @@ import { useSelector } from "react-redux";
 import DeletePost from "./delete-post";
 import { Dispatch, SetStateAction, useState } from "react";
 import Post from "@/types/Post";
+import { Link } from "react-router-dom";
 
 function DashboardPostList({
   setSelectedId,
@@ -37,6 +38,7 @@ function DashboardPostList({
     setPost(post);
     setOpenDeleteDialog(true);
   };
+
   return (
     <>
       <Table className="border">
@@ -44,7 +46,7 @@ function DashboardPostList({
         <TableHeader>
           <TableRow>
             <TableHead>Identifier</TableHead>
-            <TableHead>Message</TableHead>
+            <TableHead>Title</TableHead>
             <TableHead>Author</TableHead>
             <TableHead>Action</TableHead>
           </TableRow>
@@ -59,9 +61,14 @@ function DashboardPostList({
           ) : (
             posts.map((post) => (
               <TableRow key={post._id}>
-                <TableCell>{post._id.substring(0, 6)}...</TableCell>
-                <TableCell>{post.message.substring(0, 40)}</TableCell>
-                <TableCell className="font-medium">
+                <TableCell>
+                  {post._id.substring(0, 6)}...
+                  {post._id.charAt(post._id.length - 1)}
+                </TableCell>
+                <TableCell>
+                  <Link className="font-semibold cursor-pointer" to={`/posts/${post._id}`}>{post.title}</Link>
+                </TableCell>
+                <TableCell>
                   {post.author.username}
                 </TableCell>
                 <TableCell className="flex gap-2 cursor-pointer">

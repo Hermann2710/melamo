@@ -36,6 +36,26 @@ export const deleteUser = createAsyncThunk<any, string>(
   }
 );
 
+export const followUser = createAsyncThunk<
+  any,
+  { user_1: string; user_2: string }
+>("/users/follow", async (data) => {
+  const response = await axios.post(`${API}/users/follow`, data, {
+    withCredentials: true,
+  });
+  return response.data;
+});
+
+export const unFollowUser = createAsyncThunk<
+  any,
+  { user_1: string; user_2: string }
+>("/users/unfollow", async (data) => {
+  const response = await axios.post(`${API}/users/unfollow`, data, {
+    withCredentials: true,
+  });
+  return response.data;
+});
+
 const usersSlice = createSlice({
   name: "usersSlice",
   initialState: initialUserState,
@@ -77,10 +97,42 @@ const usersSlice = createSlice({
       .addCase(deleteUser.fulfilled, (state, action) => {
         state.isLoading = false;
         if (action.payload.success) {
-          state.users = state.users.filter((user) => user._id !== action.payload.user._id);
+          state.users = state.users.filter(
+            (user) => user._id !== action.payload.user._id
+          );
         }
       })
       .addCase(deleteUser.rejected, (state) => {
+        state.isLoading = false;
+      })
+      // Handle Follow user
+      .addCase(followUser.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(followUser.fulfilled, (state, action) => {
+        state.isLoading = false;
+        if (action.payload.success) {
+          state.users = state.users.map((user) =>
+            user._id === action.payload.user._id ? action.payload.user : user
+          );
+        }
+      })
+      .addCase(followUser.rejected, (state) => {
+        state.isLoading = false;
+      })
+      // Handle unFollow user
+      .addCase(unFollowUser.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(unFollowUser.fulfilled, (state, action) => {
+        state.isLoading = false;
+        if (action.payload.success) {
+          state.users = state.users.map((user) =>
+            user._id === action.payload.user._id ? action.payload.user : user
+          );
+        }
+      })
+      .addCase(unFollowUser.rejected, (state) => {
         state.isLoading = false;
       });
   },

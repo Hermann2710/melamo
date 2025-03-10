@@ -115,12 +115,14 @@ function DashboardForm({
               <SheetDescription>{formDescription}</SheetDescription>
             )}
           </SheetHeader>
+          <div className="flex flex-col gap-4">
           {formControls.map((control) => (
             <div className="flex flex-col gap-2" key={control.label}>
               <Label htmlFor={control.name}>{control.label}</Label>
               {renderFormControl(control)}
             </div>
           ))}
+          </div>
           <SheetFooter className="mt-3">
             <Button type="submit" className="w-full">
               {isEditMode ? "Update" : "Add"}

@@ -18,6 +18,12 @@ import { fetchUsers } from "./store/users";
 import DashboardSettings from "./screens/dashboard/settings";
 import DashboardProfile from "./screens/dashboard/settings/profile";
 import DashboardUsersDetails from "./screens/dashboard/users/details";
+import HomeLayout from "./components/home/layout";
+import HomePage from "./screens/home";
+import Posts from "./screens/home/posts";
+import DetailsPost from "./screens/home/posts/details";
+import HomeUsers from "./screens/home/users";
+import HomeMessages from "./screens/home/messages";
 
 function App() {
   const dispatch = useDispatch<AppDispatch>();
@@ -35,6 +41,16 @@ function App() {
 
   return (
     <Routes>
+      {/* Home Routes */}
+      <Route path="/" Component={HomeLayout}>
+        <Route path="" Component={HomePage} />
+        <Route path="posts" Component={Posts} />
+        <Route path="posts/:post_id" Component={DetailsPost} />
+        <Route path="users" Component={HomeUsers} />
+        <Route path="users/:username" Component={HomeUsers} />
+        <Route path="messages" Component={HomeMessages} />
+        <Route path="messages/:username" Component={HomeMessages} />
+      </Route>
       {/* Auth routes */}
       <Route path="/auth" Component={AuthLayout}>
         <Route path="register" Component={Register} />

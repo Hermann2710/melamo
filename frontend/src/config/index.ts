@@ -93,3 +93,10 @@ export const SidebarDashboardData = {
     },
   ],
 };
+
+export const NavbarHomeData = [
+  { title: "Home", path: '/' },
+  { title: "Projects", path: '/projects' },
+  { title: "Posts", path: '/posts' },
+  { title: "Contact", path: '/contact' },
+];

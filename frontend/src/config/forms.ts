@@ -2,6 +2,30 @@ import FormControl from "@/types/FormControl";
 
 export const PostFormData: FormControl[] = [
   {
+    label: "Title",
+    name: "title",
+    placeholder: "Title",
+    componentType: "input",
+    type: "text",
+    required: false,
+  },
+  {
+    label: "Slug",
+    name: "slug",
+    placeholder: "Slug",
+    componentType: "input",
+    type: "text",
+    required: false,
+  },
+  {
+    label: "Subtitle",
+    name: "subtitle",
+    placeholder: "Subtitle",
+    componentType: "input",
+    type: "text",
+    required: false,
+  },
+  {
     label: "Message",
     name: "message",
     placeholder: "Message",

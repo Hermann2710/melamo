@@ -1,5 +1,8 @@
 export default interface Post {
   _id: string;
+  title: string;
+  subtitle: string;
+  slug: string;
   message: string;
   author: any;
   createdAt: string;
@@ -16,6 +19,9 @@ export const initialPostState: {
 
 export const initialPostData: Post = {
   _id: "",
+  title: "",
+  subtitle: "",
+  slug: "",
   message: "",
   author: null,
   createdAt: "",

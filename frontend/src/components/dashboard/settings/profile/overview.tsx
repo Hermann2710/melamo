@@ -14,14 +14,61 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { RootState } from "@/store";
+import { AppDispatch, RootState } from "@/store";
+import { followUser, unFollowUser } from "@/store/users";
 import User from "@/types/User";
 import { Loader } from "lucide-react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
+import { toast } from "sonner";
 
 function ProfileOverview({ user }: { user: User | null }) {
   const auth = useSelector((state: RootState) => state.authReducer);
+  const { posts } = useSelector((state: RootState) => state.postsReducer);
+  const dispatch = useDispatch<AppDispatch>();
+
+  const findPosts = () => {
+    let count = 0;
+    posts.map((post) => {
+      if(user) {
+        if(post.author._id === user._id) {
+          count+=1;
+        }
+      }
+    })
+    return count;
+  }
+
+  const follow = () => {
+    if (!user) {
+      return false;
+    } else {
+      return user.followers.includes(auth.user!._id);
+    }
+  };
+
+  const handleFollow = () => {
+    dispatch(followUser({ user_1: user!._id, user_2: auth.user!._id }))
+    .then((action) => {
+      if(action.payload.success) {
+        return toast.success(action.payload.message, { closeButton: true });
+      }else {
+        return toast.error(action.payload.message, { closeButton: true });
+      }
+    })
+  };
+
+  const handleUnFollow = () => {
+    dispatch(unFollowUser({ user_1: user!._id, user_2: auth.user!._id }))
+    .then((action) => {
+      if(action.payload.success) {
+        return toast.success(action.payload.message, { closeButton: true });
+      }else {
+        return toast.error(action.payload.message, { closeButton: true });
+      }
+    })
+  };
+
   return (
     <div className="full">
       {!user ? (
@@ -84,11 +131,17 @@ function ProfileOverview({ user }: { user: User | null }) {
                     <Link to={`posts/${user.username}`} className="font-medium">
                       Posts
                     </Link>
-                    <span>{user.followings.length}</span>
+                    <span>{findPosts()}</span>
                   </div>
                 </div>
                 {auth.user?._id !== user._id && (
-                  <Button className="w-fit block mx-auto">Follow</Button>
+                  <div className="w-fit block mx-auto">
+                    {follow() ? (
+                      <Button onClick={handleUnFollow} variant="destructive">Unfollow</Button>
+                    ) : (
+                      <Button onClick={handleFollow}>Follow</Button>
+                    )}
+                  </div>
                 )}
               </div>
             </CardContent>

@@ -12,7 +12,7 @@ function DashboardUsers() {
 
   useEffect(() => {
     dispatch(fetchUsers());
-  }, []);
+  }, [dispatch]);
 
   return (
     <div>

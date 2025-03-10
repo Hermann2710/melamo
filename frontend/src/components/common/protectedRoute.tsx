@@ -10,7 +10,7 @@ function ProtectedRoute({ children }: PropsWithChildren) {
   const pathname = useLocation().pathname;
 
   if (!isAuthenticated && pathname.includes("/dashboard")) {
-    return <Navigate to="/auth/login" />;
+    return <Navigate to="/" />;
   } else if (isAuthenticated && pathname.includes("/auth")) {
     return <Navigate to="/dashboard" />;
   } else {
